@@ -9,7 +9,6 @@
 - [OpenAI API](#openai-api)
 - [Authentication](#authentication)
 - [Classes (and Layouts)](#classes)
-- [Layouts](#layouts)
 - [Libraries](#libraries)
 
 ## Speech to Text
@@ -22,7 +21,7 @@ It works using the [Android Speech Recognition](https://developer.android.com/re
 3. Set a `RecognitionListener` to receive speech recognition events
 4. Call `startListening()` to begin recognition when `micButton` is pressed
 5. Receive results in `RecognitionListener.onResults()`
-6. Send the transcript to the [OpenAI API](#openai-api) (if not empty) as part of the chat history
+6. Send the transcript to the [OpenAI API](#openai-api) (if not empty) as part of the whole chat conversation
 
 For example `micButton` size depends on the [RMS](https://majormixing.com/what-is-rms-in-audio-world/) value of the user's voice.
 ```kotlin
@@ -38,7 +37,7 @@ RMS stands for Root Mean Square and is a measure of the average power or intensi
 $$RMS = \sqrt{\frac{1}{N}\sum_{i=1}^{N}x_i^2}$$
 
 ## Text to Speech
-Converso also uses the [Android's TextToSpeech](https://developer.android.com/reference/android/speech/tts/TextToSpeech) engine to read the assistant messages out loud.
+Converso also uses [Android Text to Speech](https://developer.android.com/reference/android/speech/tts/TextToSpeech) to read the assistant messages out loud.
 
 1. Create a `TextToSpeech` instance
 2. Call `setLanguage()` to download voice data (if not installed) e.g. `Locale.US`.
@@ -63,16 +62,17 @@ And `role` can be `user`, `assistant` or `system` (this last one for context e.g
 A data class is a class specifically designed for storing data, and it automatically generates common methods like equals, hashCode, and toString.
 
 ## OpenAI API
-The crown jewel of this project is the super easy-to-use [OpenAI API](https://openai.com/blog/openai-api) which takes the chat history and retrieves the a generated response from the GPT models. Commonly using `GPT-3.5-turbo` or `GPT-4`.
+The crown jewel of this project is the super easy-to-use [OpenAI API](https://openai.com/blog/openai-api) which takes the whole chat conversation (with the user message at the end) and retrieves the generated response from the GPT models. Commonly using `GPT-3.5-turbo` or `GPT-4`.
 
 Given an API Key, that could be edited in the app:
 
-2. Create OkHttpClient for networking
-3. Build JSON request body with chat history and parameters
-4. Make POST request to `/chat/completions` endpoint
-5. Deserialize JSON response with Gson
-6. Extract generated text from response
+1. Create an `OkHttpClient` instance
+2. Build the request with the API Key in the `Authorization` header
+3. Send the request to the [OpenAI API](https://openai.com/blog/openai-api) endpoint
+4. Deserialize the JSON response with [Gson](https://github.com/google/gson) using the [ResponseJson](app/src/main/java/com/ceibotech/converso/ResponseJson.kt) class and get the response message
+5. Add the assistant message to the chat RecyclerView
 
+The `messages` ArrayList is the chat history, which is sent to the OpenAI API as part of the request body.
 ```kotlin
 private fun sendChatToOpenAIAndRetrieveResponse() {
 
@@ -133,9 +133,9 @@ It works thank to the [Firebase Auth](https://firebase.google.com/docs/auth) ser
 2. Check if user is signed in
 3. Trigger Email Sign-In flow if not
 4. Save user's ID token on successful sign-in
-5. Redirect to [MainActivity](app\src\main\java\com\ceibotech\converso\MainActivity.kt)
+5. Redirect to [MainActivity](app/src/main/java/com/ceibotech/converso/MainActivity.kt)
 
-On [AuthActivity](app\src\main\java\com\ceibotech\converso\AuthActivity.kt) if the user clicks the `signInButton` and the credentials are valid, we call `signIn()`
+On [AuthActivity](app/src/main/java/com/ceibotech/converso/AuthActivity.kt) if the user clicks the `signInButton` and the credentials are valid, we call `signIn()`
 ```kotlin
 binding.signInButton.setOnClickListener {
     val email = binding.emailEditText.text.toString()
@@ -162,12 +162,12 @@ val passwordRegex = Regex("^(?=.*[A-Z])(?=.*[0-9]).{8,}$")
 (?=.*[a-z])       # a lower case letter must occur at least once
 (?=.*[A-Z])       # an upper case letter must occur at least once
 (?=.*[@#$%^&+=])  # a special character must occur at least once you can replace with your special characters
-(?=\\S+$)          # no whitespace allowed in the entire string
+(?=\\S+$)         # no whitespace allowed in the entire string
 .{4,}             # anything, at least six places though
 $                 # end-of-string
 ```
 
-In [MainActivity](app\src\main\java\com\ceibotech\converso\MainActivity.kt) we check if the user is signed in and if not we redirect to [AuthActivity](app\src\main\java\com\ceibotech\converso\AuthActivity.kt)
+In [MainActivity](app/src/main/java/com/ceibotech/converso/MainActivity.kt) we check if the user is signed in and if not we redirect to [AuthActivity](app/src/main/java/com/ceibotech/converso/AuthActivity.kt)
 ```kotlin
 if (savedInstanceState == null) {
     auth = Firebase.auth
@@ -182,15 +182,15 @@ if (savedInstanceState == null) {
 `savedInstanceState` helps to avoid checking if user is signed in every time the activity is recreated, for example when the device is rotated.
 
 ## Classes
-- [AuthActivity](app\src\main\java\com\ceibotech\converso\AuthActivity.kt): Handles user authentication.
-    - [activity_auth.xml](app\src\main\res\layout\activity_auth.xml)
-- [MainActivity](app\src\main\java\com\ceibotech\converso\MainActivity.kt): Chat with the assistant/edit API Key.
-    - [activity_main.xml](app\src\main\res\layout\activity_main.xml)
-- [Message](app\src\main\java\com\ceibotech\converso\Message.kt): Data class that represents a chat message in the format received from the OpenAI API.
-- [ChatAdapter](app\src\main\java\com\ceibotech\converso\ChatAdapter.kt): Adapter for the chat RecyclerView.
-- [MessageViewHolder](app\src\main\java\com\ceibotech\converso\MessageViewHolder.kt): ViewHolder for the chat RecyclerView.
-    - Inflates [user_message.xml](app\src\main\res\layout\user_message.xml) or [assistant_message.xml](app\src\main\res\layout\assistant_message.xml) depending on the message `role`.
-- [ResponseJson](app\src\main\java\com\ceibotech\converso\ResponseJson.kt): Represents the JSON response from the OpenAI API.
+- [AuthActivity](app/src/main/java/com/ceibotech/converso/AuthActivity.kt): Handles user authentication.
+    - [activity_auth.xml](app/src/main/res/layout/activity_auth.xml)
+- [MainActivity](app/src/main/java/com/ceibotech/converso/MainActivity.kt): Chat with the assistant/edit API Key.
+    - [activity_main.xml](app/src/main/res/layout/activity_main.xml)
+- [Message](app/src/main/java/com/ceibotech/converso/Message.kt): Data class that represents a chat message in the format received from the OpenAI API.
+- [ChatAdapter](app/src/main/java/com/ceibotech/converso/ChatAdapter.kt): Adapter for the chat RecyclerView.
+- [MessageViewHolder](app/src/main/java/com/ceibotech/converso/MessageViewHolder.kt): ViewHolder for the chat RecyclerView.
+    - Inflates [user_message.xml](app/src/main/res/layout/user_message.xml) or [assistant_message.xml](app/src/main/res/layout/assistant_message.xml) depending on the message `role`.
+- [ResponseJson](app/src/main/java/com/ceibotech/converso/ResponseJson.kt): Represents the JSON response from the OpenAI API.
 
 ## Libraries
 - [OkHttp](https://square.github.io/okhttp/) - Handling networking requests
