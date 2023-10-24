@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1079608935033",
+    "firebase_url": "https://converso-379720-default-rtdb.firebaseio.com",
+    "project_id": "converso-379720",
+    "storage_bucket": "converso-379720.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079608935033:android:edf8afcbc3116716538aa8",
+        "android_client_info": {
+          "package_name": "com.ceibotech.converso"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079608935033-ee6ppa9cl61j9dt2fgp6o4h70o093hvr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtBcdRN6QX8hTbgtMpc644hbuCP-wGbs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079608935033-ee6ppa9cl61j9dt2fgp6o4h70o093hvr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,6 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Converso" parent="Theme.Material3.DayNight">
+        <item name="colorPrimaryContainer">@color/darkGray</item>
+    </style>
+</resources>
