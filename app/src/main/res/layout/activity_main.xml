@@ -82,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
                 tools:text="richardpfeynman@caltech.edu.us" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -95,7 +95,7 @@
                     android:id="@+id/OpenAIAPIKeyEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="OpenAI API Key"
+                    android:hint="@string/openai_api_key"
                     android:inputType="textPassword"
                     android:text="" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -113,8 +113,8 @@
                     android:id="@+id/customInstructionsEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Custom Instructions"
-                    android:text="Keep responses short." />
+                    android:hint="@string/custom_instructions"
+                    android:text="Keep responses short" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.divider.MaterialDivider
@@ -123,10 +123,11 @@
                 android:layout_marginVertical="24dp" />
 
             <TextView
-                android:id="@+id/usageTextView"
+                android:id="@+id/tokenUsageTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="Usage: 3141 tokens\nCost: 0.0063 USD" />
+                android:textSize="16sp"
+                tools:text="@string/token_usage" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
@@ -135,9 +136,10 @@
 
             <TextView
                 android:id="@+id/signOutTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sign Out" />
+                android:text="@string/sign_out"
+                android:textSize="16sp" />
         </LinearLayout>
     </com.google.android.material.navigation.NavigationView>
 

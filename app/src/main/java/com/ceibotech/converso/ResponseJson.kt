@@ -22,23 +22,23 @@ package com.ceibotech.converso
 }
 */
 
-class ResponseJson {
-    var id: String? = null
-    var `object`: String? = null
-    var created: Int? = null
-    var model: String? = null
-    var choices: List<Choice>? = null
-    var usage: Usage? = null
-}
+class ResponseJson(
+    val id: String,
+    val `object`: String,
+    val created: Int,
+    val model: String,
+    val choices: List<Choice>,
+    val usage: Usage
+)
 
-class Choice {
-    var index: Int? = null
-    var message: Message? = null
-    var finish_reason: String? = null
-}
+class Choice(
+    val index: Int,
+    val message: Message,
+    val finish_reason: String
+)
 
-class Usage {
-    var prompt_tokens: Int? = null
-    var completion_tokens: Int? = null
-    var total_tokens: Int? = null
-}
+class Usage(
+    val prompt_tokens: Int,
+    val completion_tokens: Int,
+    val total_tokens: Int
+)

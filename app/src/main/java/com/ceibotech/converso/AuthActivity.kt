@@ -3,8 +3,11 @@ package com.ceibotech.converso
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Toast
 import com.ceibotech.converso.databinding.ActivityAuthBinding
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthResult
 
 class AuthActivity : AppCompatActivity() {
 
@@ -15,30 +18,25 @@ class AuthActivity : AppCompatActivity() {
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.signInButton.setOnClickListener {
-            val email = binding.emailEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
+        binding.signInButton.setOnClickListener { performAuth(true) }
+        binding.signUpButton.setOnClickListener { performAuth(false) }
+    }
 
-            if (isEmailValid(email) && isPasswordValid(password)) {
-                binding.signInButton.isEnabled = false
-                signIn(email, password)
-            }
-        }
+    private fun performAuth(signIn: Boolean) {
+        val email = binding.emailEditText.text.toString()
+        val password = binding.passwordEditText.text.toString()
 
-        binding.signUpButton.setOnClickListener {
-            val email = binding.emailEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
+        if (isEmailValid(email) && isPasswordValid(password)) {
+            toggleButtons(false) // disable buttons to avoid multiple requests
 
-            if (isEmailValid(email) && isPasswordValid(password)) {
-                binding.signUpButton.isEnabled = false
-                signUp(email, password)
-            }
+            if (signIn) signIn(email, password)
+            else signUp(email, password)
         }
     }
 
     private fun isEmailValid(email: String): Boolean {
-        if (email.isEmpty()) {
-            binding.emailTextInputLayout.error = "Email is required"
+        if (!email.contains("@") || !email.contains(".")) {
+            binding.emailTextInputLayout.error = "Invalid email"
             return false
         }
         binding.emailTextInputLayout.error = null
@@ -46,9 +44,11 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun isPasswordValid(password: String): Boolean {
-        val passwordRegex = Regex("^(?=.*[A-Z])(?=.*[0-9]).{8,}$")
-        if (!passwordRegex.matches(password)) {
-            binding.passwordTextInputLayout.error = "Password must contain:\n- 8 characters\n- 1 uppercase letter (A-Z)\n- 1 number (0-9)"
+        if (!Regex("^(?=.*[A-Z])(?=.*[0-9]).{8,}$").matches(password)) {
+            binding.passwordTextInputLayout.error = "Password must contain:\n" +
+                    "- 8 characters\n" +
+                    "- 1 uppercase letter (A-Z)\n" +
+                    "- 1 number (0-9)"
             return false
         }
         binding.passwordTextInputLayout.error = null
@@ -57,31 +57,30 @@ class AuthActivity : AppCompatActivity() {
 
     private fun signIn(email: String, password: String) {
         MainActivity.auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    goToMainActivity()
-                } else {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-                    binding.signInButton.isEnabled = true
-                }
-            }
+            .addOnCompleteListener(this) { handleAuthResult(it) }
     }
 
     private fun signUp(email: String, password: String) {
         MainActivity.auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    goToMainActivity()
-                } else {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-                    binding.signUpButton.isEnabled = true
-                }
-            }
+            .addOnCompleteListener(this) { handleAuthResult(it) }
+    }
+
+    private fun handleAuthResult(task: Task<AuthResult>) {
+        if (task.isSuccessful) {
+            goToMainActivity()
+        } else {
+            Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
+            toggleButtons(true)
+        }
     }
 
     private fun goToMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    private fun toggleButtons(enabled: Boolean) {
+        binding.signInButton.isEnabled = enabled
+        binding.signUpButton.isEnabled = enabled
     }
 }

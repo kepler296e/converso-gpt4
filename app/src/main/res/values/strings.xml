@@ -2,4 +2,16 @@
     <string name="app_name">Converso</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <!-- auth -->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="sign_out">Sign out</string>
+    <!-- openai api -->
+    <string name="openai_api_key">OpenAI API Key</string>
+    <string name="custom_instructions">Custom instructions</string>
+    <!-- database -->
+    <string name="token_usage">Usage: %1$d tokens\nCost: %2$.4f USD</string>
 </resources>

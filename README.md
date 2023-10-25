@@ -8,6 +8,7 @@
 - [Text to Speech](#text-to-speech)
 - [OpenAI API](#openai-api)
 - [Authentication](#authentication)
+- [Realtime Database](#realtime-database)
 - [Classes (and Layouts)](#classes)
 - [Libraries](#libraries)
 
@@ -37,7 +38,7 @@ RMS stands for Root Mean Square and is a measure of the average power or intensi
 $$RMS = \sqrt{\frac{1}{N}\sum_{i=1}^{N}x_i^2}$$
 
 ## Text to Speech
-Converso also uses [Android Text to Speech](https://developer.android.com/reference/android/speech/tts/TextToSpeech) to read the assistant messages out loud.
+Converso also uses [Android Text to Speech](https://developer.android.com/reference/android/speech/tts/TextToSpeech) to read the assistant's messages out loud.
 
 1. Create a `TextToSpeech` instance
 2. Call `setLanguage()` to download voice data (if not installed) e.g. `Locale.US`.
@@ -56,7 +57,7 @@ Where `Message` is a [data class](#why-data-class-instead-of-just-class) that re
 ```kotlin
 data class Message(val role: String, val content: String)
 ```
-And `role` can be `user`, `assistant` or `system` (this last one for context e.g. Keep responses short).
+And `role` can be `user`, `assistant` or `system` (the last one is for context e.g. "Keep responses short").
 
 #### Why Data Class instead of just Class?
 A data class is a class specifically designed for storing data, and it automatically generates common methods like equals, hashCode, and toString.
@@ -181,20 +182,41 @@ if (savedInstanceState == null) {
 ```
 `savedInstanceState` helps to avoid checking if user is signed in every time the activity is recreated, for example when the device is rotated.
 
+## Realtime Database
+Using the [Firebase Realtime Database](https://firebase.google.com/docs/database) we can store the token usage of each user, and limit the number of requests per day.
+
+Incrementing `tokenUsage` for each assistant response
+```kotlin
+tokenUsage += responseJson.usage.total_tokens
+```
+
+And then saving it to the database
+```kotlin
+val userRef = database.getReference("users/${auth.currentUser?.uid}/token_usage")
+userRef.get()
+    .addOnSuccessListener {
+        userRef.setValue(tokenUsage)
+    }
+    .addOnFailureListener {
+        Log.e("Error updating tokenUsage", it.message!!)
+    }
+```
+
 ## Classes
 - [AuthActivity](app/src/main/java/com/ceibotech/converso/AuthActivity.kt): Handles user authentication.
     - [activity_auth.xml](app/src/main/res/layout/activity_auth.xml)
 - [MainActivity](app/src/main/java/com/ceibotech/converso/MainActivity.kt): Chat with the assistant/edit API Key.
     - [activity_main.xml](app/src/main/res/layout/activity_main.xml)
 - [Message](app/src/main/java/com/ceibotech/converso/Message.kt): Data class that represents a chat message in the format received from the OpenAI API.
-- [ChatAdapter](app/src/main/java/com/ceibotech/converso/ChatAdapter.kt): Adapter for the chat RecyclerView.
+- [MessageAdapter](app/src/main/java/com/ceibotech/converso/MessageAdapter.kt): Adapter for the chat RecyclerView.
 - [MessageViewHolder](app/src/main/java/com/ceibotech/converso/MessageViewHolder.kt): ViewHolder for the chat RecyclerView.
     - Inflates [user_message.xml](app/src/main/res/layout/user_message.xml) or [assistant_message.xml](app/src/main/res/layout/assistant_message.xml) depending on the message `role`.
 - [ResponseJson](app/src/main/java/com/ceibotech/converso/ResponseJson.kt): Represents the JSON response from the OpenAI API.
+- [User](app/src/main/java/com/ceibotech/converso/User.kt): Data class that represents a user in the database.
 
 ## Libraries
-- [OkHttp](https://square.github.io/okhttp/) - Handling networking requests
-- [Gson](https://github.com/google/gson) - Handling networking requests
+- [OkHttp](https://square.github.io/okhttp/) - Handling network requests
+- [Gson](https://github.com/google/gson) - Handling network requests
 - [Material Design](https://m3.material.io/) - UI components
 - Firebase
     - [Auth](https://firebase.google.com/docs/auth) - Email Sign-In
